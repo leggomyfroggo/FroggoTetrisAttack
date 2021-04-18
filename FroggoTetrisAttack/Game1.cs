@@ -1,16 +1,21 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+
+using WarnerEngine.Services;
 
 namespace FroggoTetrisAttack
 {
     public class Game1 : Game
     {
         private GraphicsDeviceManager _graphics;
-        private SpriteBatch _spriteBatch;
 
         public Game1()
         {
+            GameService.Initialize();
+
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
@@ -18,16 +23,23 @@ namespace FroggoTetrisAttack
 
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
-
             base.Initialize();
         }
 
         protected override void LoadContent()
         {
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
+            GameService.GetService<IRenderService>()
+                .SetGraphicsDevice(GraphicsDevice)
+                .SetInternalResolution(640, 360)
+                .SetSamplerState(SamplerState.PointWrap);
 
-            // TODO: use this.Content to load your game content here
+            GameService.GetService<IContentService>()
+                .Bootstrap(Content, GraphicsDevice)
+                .LoadAllContent();
+
+            GameService.GetService<ISceneService>()
+                .RegisterScene("game_scene", new Scenes.GameScene())
+                .SetScene("game_scene");
         }
 
         protected override void Update(GameTime gameTime)
@@ -35,16 +47,20 @@ namespace FroggoTetrisAttack
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
+            float DT = Math.Min((float)gameTime.ElapsedGameTime.TotalMilliseconds / 1000f, 0.033f);
+
+            GameService.GetService<IStateService>().SetGlobalGameTime((float)gameTime.TotalGameTime.TotalMilliseconds);
+            GameService.GetService<IStateService>().IncrementGlobalFrameCount();
+
+            GameService.PreDraw(DT);
 
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-
-            // TODO: Add your drawing code here
+            GameService.Draw();
+            GameService.PostDraw();
 
             base.Draw(gameTime);
         }

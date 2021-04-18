@@ -5,7 +5,13 @@ VisualStudioVersion = 16.0.31105.61
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FroggoTetrisAttack", "FroggoTetrisAttack\FroggoTetrisAttack.csproj", "{5C120071-FAFA-4571-A631-6C5BDA15EBB7}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WarnerEngine", "WarnerEngine\WarnerEngine.shproj", "{265459CF-6AE4-4B5C-A0FD-CCFBCE0D7A0B}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		WarnerEngine\WarnerEngine.projitems*{265459cf-6ae4-4b5c-a0fd-ccfbce0d7a0b}*SharedItemsImports = 13
+		WarnerEngine\WarnerEngine.projitems*{5c120071-fafa-4571-a631-6c5bda15ebb7}*SharedItemsImports = 5
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
