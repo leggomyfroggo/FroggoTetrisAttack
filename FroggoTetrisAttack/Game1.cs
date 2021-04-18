@@ -17,6 +17,8 @@ namespace FroggoTetrisAttack
             GameService.Initialize();
 
             _graphics = new GraphicsDeviceManager(this);
+            _graphics.PreferredBackBufferWidth = 1280;
+            _graphics.PreferredBackBufferHeight = 720;
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
         }
@@ -30,7 +32,7 @@ namespace FroggoTetrisAttack
         {
             GameService.GetService<IRenderService>()
                 .SetGraphicsDevice(GraphicsDevice)
-                .SetInternalResolution(640, 360)
+                .SetInternalResolution(400, 240)
                 .SetSamplerState(SamplerState.PointWrap);
 
             GameService.GetService<IContentService>()
