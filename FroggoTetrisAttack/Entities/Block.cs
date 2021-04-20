@@ -10,7 +10,7 @@ namespace FroggoTetrisAttack.Entities
 {
     public class Block : IPreDraw
     {
-        private const int BLOCK_SIZE = 16;
+        public const int BLOCK_SIZE = 16;
 
         private int _xIndex;
         private int _yIndex;
@@ -24,6 +24,8 @@ namespace FroggoTetrisAttack.Entities
             Yellow = 3, 
             Purple = 4 
         }
+
+        public State.BlockStateMachine StateMachine { get; private set; }
 
         private static Dictionary<BlockType, Color> BlockTypeToColor = new Dictionary<BlockType, Color>() 
         {
@@ -39,11 +41,15 @@ namespace FroggoTetrisAttack.Entities
         public Block(BlockType BType, int XIndex, int YIndex)
         {
             this.BType = BType;
+            StateMachine = new State.BlockStateMachine(new State.BlockReadyState(), this);
             _xIndex = XIndex;
             _yIndex = YIndex;
         }
 
-        public void PreDraw(float DT) { }
+        public void PreDraw(float DT) 
+        {
+            StateMachine.Update(this, DT);
+        }
 
         public void Draw(int PlayFieldX, int PlayFieldY)
         {
@@ -68,6 +74,11 @@ namespace FroggoTetrisAttack.Entities
         public bool IsVisible()
         {
             return true;
+        }
+
+        public void ChangeType(BlockType NewType)
+        {
+            BType = NewType;
         }
     }
 }
