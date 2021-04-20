@@ -27,11 +27,15 @@ namespace FroggoTetrisAttack.Entities
         {
             Random rand = new Random();
             _blocks = new Block[WIDTH, HEIGHT];
+            int remainingInitialBlocks = 36;
             for (int x = 0; x < WIDTH; x++)
             {
+                int columnMin = remainingInitialBlocks - (WIDTH - x - 1) * 7;
+                int columnBlockCount = rand.Next(columnMin, 7 + 1);
+                remainingInitialBlocks -= columnBlockCount;
                 for (int y = 0; y < HEIGHT; y++)
                 {
-                    if (y < 6)
+                    if (y < HEIGHT - columnBlockCount)
                     {
                         _blocks[x, y] = new Block(Block.BlockType.Empty, x, y);
                     }
