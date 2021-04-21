@@ -45,6 +45,13 @@ namespace FroggoTetrisAttack
             GameService.GetService<ISceneService>()
                 .RegisterScene("game_scene", new Scenes.GameScene())
                 .SetScene("game_scene");
+
+            GameService.GetService<IInputService>()
+                .RegisterInput(InputAction.Left, Key: Keys.Left)
+                .RegisterInput(InputAction.Right, Key: Keys.Right)
+                .RegisterInput(InputAction.Up, Key: Keys.Up)
+                .RegisterInput(InputAction.Down, Key: Keys.Down)
+                .RegisterInput(InputAction.Interact, Key: Keys.Space);
         }
 
         protected override void Update(GameTime gameTime)

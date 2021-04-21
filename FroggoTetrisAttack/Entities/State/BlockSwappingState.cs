@@ -2,7 +2,7 @@
 {
     public class BlockSwappingState : BlockState
     {
-        private const int SWAP_SPEED = 4;
+        private const int SWAP_SPEED = 6;
         private SwapDirection _swapDirection;
         private int _offset;
         private bool _latch;

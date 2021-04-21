@@ -105,23 +105,23 @@ namespace FroggoTetrisAttack.Entities
             }
 
             var inputService = GameService.GetService<IInputService>();
-            if (inputService.WasKeyPressed(Keys.Left))
+            if (inputService.WasActionPressed(InputAction.Left))
             {
                 _swapperXIndex = Math.Clamp(_swapperXIndex - 1, 0, WIDTH - 2);
             }
-            else if (inputService.WasKeyPressed(Keys.Right))
+            else if (inputService.WasActionPressed(InputAction.Right))
             {
                 _swapperXIndex = Math.Clamp(_swapperXIndex + 1, 0, WIDTH - 2);
             }
-            if (inputService.WasKeyPressed(Keys.Up))
+            if (inputService.WasActionPressed(InputAction.Up))
             {
                 _swapperYIndex = Math.Clamp(_swapperYIndex - 1, 0, HEIGHT - 1);
             }
-            else if (inputService.WasKeyPressed(Keys.Down))
+            else if (inputService.WasActionPressed(InputAction.Down))
             {
                 _swapperYIndex = Math.Clamp(_swapperYIndex + 1, 0, HEIGHT - 1);
             }
-            if (inputService.WasKeyPressed(Keys.Space))
+            if (inputService.WasActionPressed(InputAction.Interact))
             {
                 var leftBlock = _blocks[_swapperXIndex, _swapperYIndex];
                 var rightBlock = _blocks[_swapperXIndex + 1, _swapperYIndex];
