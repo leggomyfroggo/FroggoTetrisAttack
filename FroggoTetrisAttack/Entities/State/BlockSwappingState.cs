@@ -24,7 +24,7 @@
             if (!_latch)
             {
                 _offset += SWAP_SPEED;
-                if (_offset >= Block.BLOCK_SIZE - SWAP_SPEED)
+                if (_offset >= Block.BLOCK_SIZE)
                 {
                     _latch = true;
                     _offset = 0;
