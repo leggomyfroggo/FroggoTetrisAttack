@@ -1,11 +1,11 @@
 ﻿namespace FroggoTetrisAttack.Entities.State
 {
-    public class BlockPreFallState : BlockState
+    public class BlockPreFallLeaderState : BlockState
     {
         private const int PAUSE_FRAMES = 10;
         private int _frameCounter;
 
-        public BlockPreFallState()
+        public BlockPreFallLeaderState()
         {
             _frameCounter = 0;
         }
@@ -17,10 +17,12 @@
 
         public override BlockState Update(float DT, Block Target, BlockContext Context)
         {
-            // TODO: Handle case where block below is in prefall state
-            if (++_frameCounter == PAUSE_FRAMES)
+            if (Context.Bottom?.BType == Block.BlockType.Empty)
             {
-                return new BlockFallingState();
+                if (++_frameCounter == PAUSE_FRAMES)
+                {
+                    return new BlockFallingState();
+                }
             }
             return this;
         }

@@ -13,9 +13,19 @@
 
         public override BlockState Update(float DT, Block Target, BlockContext Context)
         {
-            if (Target.BType != Block.BlockType.Empty && Context.Bottom?.BType == Block.BlockType.Empty)
+            if (Target.BType != Block.BlockType.Empty)
             {
-                return new BlockPreFallState();
+                if (Context.Bottom?.BType == Block.BlockType.Empty)
+                {
+                    return new BlockPreFallLeaderState();
+                }
+                else if (
+                    Context.Bottom?.StateMachine.CurrentState is BlockPreFallLeaderState || 
+                    Context.Bottom?.StateMachine.CurrentState is BlockPreFallFollowerState
+                )
+                {
+                    return new BlockPreFallFollowerState();
+                }
             }
             return this;
         }
