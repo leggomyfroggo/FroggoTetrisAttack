@@ -17,6 +17,7 @@ namespace FroggoTetrisAttack.Entities
         private const int HEIGHT = 12;
 
         private Block[,] _blocks;
+        private Block[,] _blockBuffer;
 
         private State.PlayFieldStateMachine _stateMachine;
 
@@ -27,6 +28,7 @@ namespace FroggoTetrisAttack.Entities
         {
             Random rand = new Random();
             _blocks = new Block[WIDTH, HEIGHT];
+            _blockBuffer = new Block[WIDTH, HEIGHT];
             int remainingInitialBlocks = 36;
             for (int x = 0; x < WIDTH; x++)
             {
@@ -37,7 +39,7 @@ namespace FroggoTetrisAttack.Entities
                 {
                     if (y < HEIGHT - columnBlockCount)
                     {
-                        _blocks[x, y] = new Block(Block.BlockType.Empty, x, y, this);
+                        _blocks[x, y] = new Block(Block.BlockType.Empty, this);
                     }
                     else
                     {
@@ -47,7 +49,7 @@ namespace FroggoTetrisAttack.Entities
                             suggestedType = (Block.BlockType)rand.Next(0, 5);
                         }
                         while ((x > 0 && _blocks[x - 1, y].BType == suggestedType) || (y > 0 && _blocks[x, y - 1].BType == suggestedType));
-                        _blocks[x, y] = new Block(suggestedType, x, y, this);
+                        _blocks[x, y] = new Block(suggestedType, this);
                     }
                 }
             }
@@ -62,13 +64,42 @@ namespace FroggoTetrisAttack.Entities
         public void OnRemove(Scene ParentScene) { }
 
         public void PreDraw(float DT) 
-        { 
+        {
+            // Primary update loop for the field, going from bottom to top to account for gravity
+            bool isInputLocked = false;
             for (int x = 0; x < WIDTH; x++)
             {
                 for (int y = HEIGHT - 1; y >= 0; y--)
                 {
-                    _blocks[x, y].PreDraw(DT);
+                    var block = GetBlockAt(x, y);
+                    block.PreDraw(
+                        DT,
+                        new State.BlockContext(GetBlockAt(x, y - 1), GetBlockAt(x + 1, y), GetBlockAt(x, y + 1), GetBlockAt(x - 1, y))
+                    );
+                    var currentBlockState = block.StateMachine.CurrentState;
+                    // Lock input if we see a block that's swapping
+                    if (!isInputLocked && currentBlockState is State.BlockSwappingState)
+                    {
+                        isInputLocked = true;
+                    }
+                    SwapBlockToBuffer(x, y, currentBlockState.GetSwapDirection());
                 }
+            }
+
+            // Merge buffer with regular field
+            for (int x = 0; x < WIDTH; x++)
+            {
+                for (int y = 0; y < HEIGHT; y++)
+                {
+                    _blocks[x, y] = _blockBuffer[x, y] ?? _blocks[x, y];
+                    UpdateBufferAt(x, y, null);
+                }
+            }
+
+            // Nope out of here if input is locked
+            if (isInputLocked)
+            {
+                return;
             }
 
             var inputService = GameService.GetService<IInputService>();
@@ -97,17 +128,20 @@ namespace FroggoTetrisAttack.Entities
                     rightBlock.StateMachine.CurrentState is State.BlockReadyState
                 )
                 {
-                    leftBlock.StateMachine.ConsiderStateChange(new State.BlockSwappingState(1, rightBlock.BType), leftBlock);
-                    rightBlock.StateMachine.ConsiderStateChange(new State.BlockSwappingState(-1, leftBlock.BType), rightBlock);
+                    leftBlock.StateMachine.ConsiderStateChange(new State.BlockSwappingState(State.BlockState.SwapDirection.Right, rightBlock.BType));
+                    rightBlock.StateMachine.ConsiderStateChange(new State.BlockSwappingState(State.BlockState.SwapDirection.Left, leftBlock.BType));
                 }
             }
         }
 
         public void Draw()
         {
-            foreach (Block block in _blocks)
+            for (int x = 0; x < WIDTH; x++)
             {
-                block.Draw(0, 0);
+                for (int y = 0; y < HEIGHT; y++)
+                {
+                    GetBlockAt(x, y).Draw(0, 0, x, y);
+                }
             }
             DrawSwapper();
         }
@@ -141,6 +175,44 @@ namespace FroggoTetrisAttack.Entities
                 return null;
             }
             return _blocks[X, Y];
+        }
+
+        public void SwapBlockToBuffer(int X, int Y, State.BlockState.SwapDirection SwapDirection)
+        {
+            Block block = GetBlockAt(X, Y);
+            Block replacedBlock = null;
+            switch (SwapDirection)
+            {
+                case State.BlockState.SwapDirection.Up:
+                    replacedBlock = GetBlockAt(X, Y - 1);
+                    UpdateBufferAt(X, Y - 1, block);
+                    break;
+                case State.BlockState.SwapDirection.Right:
+                    replacedBlock = GetBlockAt(X + 1, Y);
+                    UpdateBufferAt(X + 1, Y, block);
+                    break;
+                case State.BlockState.SwapDirection.Down:
+                    replacedBlock = GetBlockAt(X, Y + 1);
+                    UpdateBufferAt(X, Y + 1, block);
+                    break;
+                case State.BlockState.SwapDirection.Left:
+                    replacedBlock = GetBlockAt(X - 1, Y);
+                    UpdateBufferAt(X - 1, Y, block);
+                    break;
+            }
+            if (_blockBuffer[X, Y] == null)
+            {
+                UpdateBufferAt(X, Y, replacedBlock);
+            }
+        }
+
+        public void UpdateBufferAt(int X, int Y, Block B)
+        {
+            if (X < 0 || X >= WIDTH || Y < 0 || Y >= HEIGHT)
+            {
+                return;
+            }
+            _blockBuffer[X, Y] = B;
         }
     }
 }

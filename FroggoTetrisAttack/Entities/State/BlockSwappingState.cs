@@ -2,13 +2,13 @@
 {
     public class BlockSwappingState : BlockState
     {
-        private int _swapDirection;
-        private Block.BlockType _newType;
+        private SwapDirection _swapDirection;
+        private bool _latch;
 
-        public BlockSwappingState(int SwapDirection, Block.BlockType NewType)
+        public BlockSwappingState(SwapDirection SwapDirection, Block.BlockType NewType)
         {
             _swapDirection = SwapDirection;
-            _newType = NewType;
+            _latch = false;
         }
 
         public override BlockState ConsiderStateChange(BlockState CandidateState, Block Target)
@@ -16,19 +16,19 @@
             return this;
         }
 
-        public override void Enter(Block Target, BlockState PreviousState) { }
-
-        public override void Exit(Block Target, BlockState IncomingState) { }
-
-        public override BlockStateType GetStateType()
+        public override BlockState Update(float DT, Block Target, BlockContext Context)
         {
-            return BlockStateType.Swapping;
+            if (!_latch)
+            {
+                _latch = true;
+                return this;
+            }
+            return new BlockReadyState();
         }
 
-        public override BlockState Update(Block Target, float DT)
+        public override SwapDirection GetSwapDirection()
         {
-            Target.ChangeType(_newType);
-            return new BlockReadyState();
+            return _swapDirection;
         }
     }
 }

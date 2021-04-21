@@ -11,21 +11,11 @@
             return this;
         }
 
-        public override void Enter(Block Target, BlockState PreviousState) { }
-
-        public override void Exit(Block Target, BlockState IncomingState) { }
-
-        public override BlockStateType GetStateType()
+        public override BlockState Update(float DT, Block Target, BlockContext Context)
         {
-            return BlockStateType.Ready;
-        }
-
-        public override BlockState Update(Block Target, float DT)
-        {
-            var bottomNeighbor = Target.GetBottomNeighbor();
-            if (bottomNeighbor != null)
+            if (Target.BType != Block.BlockType.Empty && Context.Bottom?.BType == Block.BlockType.Empty)
             {
-                if (bottomNeighborbottomNeighbor.StateMachine.CurrentState is )
+                return new BlockPreFallState();
             }
             return this;
         }

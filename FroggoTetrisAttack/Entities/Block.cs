@@ -11,9 +11,6 @@ namespace FroggoTetrisAttack.Entities
     {
         public const int BLOCK_SIZE = 16;
 
-        public int XIndex;
-        public int YIndex;
-
         public PlayField PField;
 
         public enum BlockType 
@@ -39,21 +36,19 @@ namespace FroggoTetrisAttack.Entities
 
         public BlockType BType { get; private set; }
 
-        public Block(BlockType BType, int XIndex, int YIndex, PlayField PField)
+        public Block(BlockType BType, PlayField PField)
         {
             this.BType = BType;
             StateMachine = new State.BlockStateMachine(new State.BlockReadyState(), this);
-            this.XIndex = XIndex;
-            this.YIndex = YIndex;
             this.PField = PField;
         }
 
-        public void PreDraw(float DT) 
+        public void PreDraw(float DT, State.BlockContext Context) 
         {
-            StateMachine.Update(this, DT);
+            StateMachine.Update(DT, Context);
         }
 
-        public void Draw(int PlayFieldX, int PlayFieldY)
+        public void Draw(int PlayFieldX, int PlayFieldY, int IndexX, int IndexY)
         {
             if (BType == BlockType.Empty)
             {
@@ -62,7 +57,7 @@ namespace FroggoTetrisAttack.Entities
 
             GameService.GetService<IRenderService>().DrawQuad(
                 GameService.GetService<IContentService>().GetWhiteTileTexture(),
-                new Rectangle(PlayFieldX + XIndex * BLOCK_SIZE, PlayFieldY + YIndex * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE),
+                new Rectangle(PlayFieldX + IndexX * BLOCK_SIZE, PlayFieldY + IndexY * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE),
                 new Rectangle(0, 0, 8, 8),
                 Tint: BlockTypeToColor[BType]
             );
@@ -81,11 +76,6 @@ namespace FroggoTetrisAttack.Entities
         public void ChangeType(BlockType NewType)
         {
             BType = NewType;
-        }
-
-        public Block GetBottomNeighbor()
-        {
-            return PField.GetBlockAt(XIndex, YIndex + 1);
         }
     }
 }
