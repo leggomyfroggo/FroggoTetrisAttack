@@ -22,6 +22,11 @@
 
         public override BlockState Update(Block Target, float DT)
         {
+            var bottomNeighbor = Target.GetBottomNeighbor();
+            if (bottomNeighbor != null)
+            {
+                if (bottomNeighborbottomNeighbor.StateMachine.CurrentState is )
+            }
             return this;
         }
     }

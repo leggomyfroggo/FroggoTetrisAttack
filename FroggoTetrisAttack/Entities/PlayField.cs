@@ -37,7 +37,7 @@ namespace FroggoTetrisAttack.Entities
                 {
                     if (y < HEIGHT - columnBlockCount)
                     {
-                        _blocks[x, y] = new Block(Block.BlockType.Empty, x, y);
+                        _blocks[x, y] = new Block(Block.BlockType.Empty, x, y, this);
                     }
                     else
                     {
@@ -47,7 +47,7 @@ namespace FroggoTetrisAttack.Entities
                             suggestedType = (Block.BlockType)rand.Next(0, 5);
                         }
                         while ((x > 0 && _blocks[x - 1, y].BType == suggestedType) || (y > 0 && _blocks[x, y - 1].BType == suggestedType));
-                        _blocks[x, y] = new Block(suggestedType, x, y);
+                        _blocks[x, y] = new Block(suggestedType, x, y, this);
                     }
                 }
             }
@@ -63,9 +63,12 @@ namespace FroggoTetrisAttack.Entities
 
         public void PreDraw(float DT) 
         { 
-            foreach (Block block in _blocks)
+            for (int x = 0; x < WIDTH; x++)
             {
-                block.PreDraw(DT);
+                for (int y = HEIGHT - 1; y >= 0; y--)
+                {
+                    _blocks[x, y].PreDraw(DT);
+                }
             }
 
             var inputService = GameService.GetService<IInputService>();
@@ -129,6 +132,15 @@ namespace FroggoTetrisAttack.Entities
         public bool IsVisible()
         {
             return true;
+        }
+
+        public Block GetBlockAt(int X, int Y)
+        {
+            if (X < 0 || X >= WIDTH || Y < 0 || Y >= HEIGHT)
+            {
+                return null;
+            }
+            return _blocks[X, Y];
         }
     }
 }

@@ -3,17 +3,18 @@
 using Microsoft.Xna.Framework;
 
 using WarnerEngine.Lib.Components;
-using WarnerEngine.Lib.Entities;
 using WarnerEngine.Services;
 
 namespace FroggoTetrisAttack.Entities
 {
-    public class Block : IPreDraw
+    public class Block
     {
         public const int BLOCK_SIZE = 16;
 
-        private int _xIndex;
-        private int _yIndex;
+        public int XIndex;
+        public int YIndex;
+
+        public PlayField PField;
 
         public enum BlockType 
         { 
@@ -38,12 +39,13 @@ namespace FroggoTetrisAttack.Entities
 
         public BlockType BType { get; private set; }
 
-        public Block(BlockType BType, int XIndex, int YIndex)
+        public Block(BlockType BType, int XIndex, int YIndex, PlayField PField)
         {
             this.BType = BType;
             StateMachine = new State.BlockStateMachine(new State.BlockReadyState(), this);
-            _xIndex = XIndex;
-            _yIndex = YIndex;
+            this.XIndex = XIndex;
+            this.YIndex = YIndex;
+            this.PField = PField;
         }
 
         public void PreDraw(float DT) 
@@ -60,7 +62,7 @@ namespace FroggoTetrisAttack.Entities
 
             GameService.GetService<IRenderService>().DrawQuad(
                 GameService.GetService<IContentService>().GetWhiteTileTexture(),
-                new Rectangle(PlayFieldX + _xIndex * BLOCK_SIZE, PlayFieldY + _yIndex * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE),
+                new Rectangle(PlayFieldX + XIndex * BLOCK_SIZE, PlayFieldY + YIndex * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE),
                 new Rectangle(0, 0, 8, 8),
                 Tint: BlockTypeToColor[BType]
             );
@@ -79,6 +81,11 @@ namespace FroggoTetrisAttack.Entities
         public void ChangeType(BlockType NewType)
         {
             BType = NewType;
+        }
+
+        public Block GetBottomNeighbor()
+        {
+            return PField.GetBlockAt(XIndex, YIndex + 1);
         }
     }
 }
