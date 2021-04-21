@@ -13,6 +13,8 @@ namespace FroggoTetrisAttack.Entities
 {
     public class PlayField : ISceneEntity, IDraw, IPreDraw
     {
+        private const int PLAYFIELD_X = 152;
+        private const int PLAYFIELD_Y = 24;
         private const int WIDTH = 6;
         private const int HEIGHT = 12;
 
@@ -140,7 +142,7 @@ namespace FroggoTetrisAttack.Entities
             {
                 for (int y = 0; y < HEIGHT; y++)
                 {
-                    GetBlockAt(x, y).Draw(0, 0, x, y);
+                    GetBlockAt(x, y).Draw(PLAYFIELD_X, PLAYFIELD_Y, x, y);
                 }
             }
             DrawSwapper();
@@ -149,11 +151,21 @@ namespace FroggoTetrisAttack.Entities
         private void DrawSwapper()
         {
             GraphicsHelper.DrawSquare(
-                new Rectangle(_swapperXIndex * Block.BLOCK_SIZE, _swapperYIndex * Block.BLOCK_SIZE, Block.BLOCK_SIZE, Block.BLOCK_SIZE),
+                new Rectangle(
+                    PLAYFIELD_X + _swapperXIndex * Block.BLOCK_SIZE, 
+                    PLAYFIELD_Y + _swapperYIndex * Block.BLOCK_SIZE, 
+                    Block.BLOCK_SIZE, 
+                    Block.BLOCK_SIZE
+                ),
                 Color.White
             );
             GraphicsHelper.DrawSquare(
-                new Rectangle((_swapperXIndex + 1) * Block.BLOCK_SIZE, _swapperYIndex * Block.BLOCK_SIZE, Block.BLOCK_SIZE, Block.BLOCK_SIZE),
+                new Rectangle(
+                    PLAYFIELD_X + (_swapperXIndex + 1) * Block.BLOCK_SIZE, 
+                    PLAYFIELD_Y + _swapperYIndex * Block.BLOCK_SIZE, 
+                    Block.BLOCK_SIZE, 
+                    Block.BLOCK_SIZE
+                ),
                 Color.White
             );
         }

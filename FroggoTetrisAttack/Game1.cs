@@ -17,8 +17,7 @@ namespace FroggoTetrisAttack
             GameService.Initialize();
 
             _graphics = new GraphicsDeviceManager(this);
-            _graphics.PreferredBackBufferWidth = 1280;
-            _graphics.PreferredBackBufferHeight = 720;
+
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
         }
@@ -26,6 +25,10 @@ namespace FroggoTetrisAttack
         protected override void Initialize()
         {
             base.Initialize();
+
+            _graphics.PreferredBackBufferWidth = 800;
+            _graphics.PreferredBackBufferHeight = 480;
+            _graphics.ApplyChanges();
         }
 
         protected override void LoadContent()

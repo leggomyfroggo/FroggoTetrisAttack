@@ -2,6 +2,8 @@
 
 using Microsoft.Xna.Framework;
 
+using WarnerEngine.Lib;
+using WarnerEngine.Lib.Helpers;
 using WarnerEngine.Lib.Components;
 using WarnerEngine.Services;
 
@@ -25,13 +27,13 @@ namespace FroggoTetrisAttack.Entities
 
         public State.BlockStateMachine StateMachine { get; private set; }
 
-        private static Dictionary<BlockType, Color> BlockTypeToColor = new Dictionary<BlockType, Color>() 
+        private static Dictionary<BlockType, Rectangle> BlockTypeToImage = new Dictionary<BlockType, Rectangle>() 
         {
-            { BlockType.Red, Color.Red },
-            { BlockType.Blue, Color.Blue },
-            { BlockType.Green, Color.LimeGreen },
-            { BlockType.Yellow, Color.Yellow },
-            { BlockType.Purple, Color.MediumPurple },
+            { BlockType.Red, GraphicsHelper.GetSheetCell(new Index2(3, 0), 16, 16) },
+            { BlockType.Blue, GraphicsHelper.GetSheetCell(new Index2(1, 0), 16, 16) },
+            { BlockType.Green, GraphicsHelper.GetSheetCell(new Index2(0, 0), 16, 16) },
+            { BlockType.Yellow, GraphicsHelper.GetSheetCell(new Index2(0, 1), 16, 16) },
+            { BlockType.Purple, GraphicsHelper.GetSheetCell(new Index2(2, 0), 16, 16) },
         };
 
         public BlockType BType { get; private set; }
@@ -56,10 +58,9 @@ namespace FroggoTetrisAttack.Entities
             }
 
             GameService.GetService<IRenderService>().DrawQuad(
-                GameService.GetService<IContentService>().GetWhiteTileTexture(),
+                "blocks",
                 new Rectangle(PlayFieldX + IndexX * BLOCK_SIZE, PlayFieldY + IndexY * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE),
-                new Rectangle(0, 0, 8, 8),
-                Tint: BlockTypeToColor[BType]
+                BlockTypeToImage[BType]
             );
         }
 

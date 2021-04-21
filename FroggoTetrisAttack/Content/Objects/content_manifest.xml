@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfContentItem>
+  <meta namespace="Objects" />
+  <!--TEXTURES-->
+  <ContentItem Key="blocks" Path="Textures\blocks" Type="Texture" />
+</ArrayOfContentItem>
