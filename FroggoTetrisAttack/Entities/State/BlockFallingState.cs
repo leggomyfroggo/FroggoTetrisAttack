@@ -21,7 +21,7 @@
             return this;
         }
 
-        public override SwapDirection GetSwapDirection()
+        public override SwapDirection GetSwapDirection(bool Peak = false)
         {
             return SwapDirection.Down;
         }

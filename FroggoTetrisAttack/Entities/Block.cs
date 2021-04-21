@@ -57,9 +57,15 @@ namespace FroggoTetrisAttack.Entities
                 return;
             }
 
+            var offset = StateMachine.CurrentState.GetSwapOffset();
             GameService.GetService<IRenderService>().DrawQuad(
                 "blocks",
-                new Rectangle(PlayFieldX + IndexX * BLOCK_SIZE, PlayFieldY + IndexY * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE),
+                new Rectangle(
+                    PlayFieldX + IndexX * BLOCK_SIZE + (int)offset.X, 
+                    PlayFieldY + IndexY * BLOCK_SIZE + (int)offset.Y, 
+                    BLOCK_SIZE, 
+                    BLOCK_SIZE
+                ),
                 BlockTypeToImage[BType]
             );
         }

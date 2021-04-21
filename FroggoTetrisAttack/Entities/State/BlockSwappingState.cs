@@ -2,12 +2,15 @@
 {
     public class BlockSwappingState : BlockState
     {
+        private const int SWAP_SPEED = 4;
         private SwapDirection _swapDirection;
+        private int _offset;
         private bool _latch;
 
         public BlockSwappingState(SwapDirection SwapDirection, Block.BlockType NewType)
         {
             _swapDirection = SwapDirection;
+            _offset = 0;
             _latch = false;
         }
 
@@ -20,15 +23,29 @@
         {
             if (!_latch)
             {
-                _latch = true;
+                _offset += SWAP_SPEED;
+                if (_offset >= Block.BLOCK_SIZE - SWAP_SPEED)
+                {
+                    _latch = true;
+                    _offset = 0;
+                }
                 return this;
             }
             return new BlockReadyState();
         }
 
-        public override SwapDirection GetSwapDirection()
+        public override SwapDirection GetSwapDirection(bool Peak = false)
         {
-            return _swapDirection;
+            if (Peak || _latch)
+            {
+                return _swapDirection;
+            }
+            return SwapDirection.None;
+        }
+
+        public override int GetSwapOffsetMagnitude()
+        {
+            return _offset;
         }
     }
 }
