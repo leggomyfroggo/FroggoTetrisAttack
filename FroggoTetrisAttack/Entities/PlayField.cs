@@ -180,11 +180,15 @@ namespace FroggoTetrisAttack.Entities
             return true;
         }
 
-        public Block GetBlockAt(int X, int Y)
+        public Block GetBlockAt(int X, int Y, bool IncludeBuffer = false)
         {
             if (X < 0 || X >= WIDTH || Y < 0 || Y >= HEIGHT)
             {
                 return null;
+            }
+            if (IncludeBuffer)
+            {
+                return _blockBuffer[X, Y] ?? _blocks[X, Y];
             }
             return _blocks[X, Y];
         }
@@ -196,19 +200,19 @@ namespace FroggoTetrisAttack.Entities
             switch (SwapDirection)
             {
                 case State.BlockState.SwapDirection.Up:
-                    replacedBlock = GetBlockAt(X, Y - 1);
+                    replacedBlock = GetBlockAt(X, Y - 1, true);
                     UpdateBufferAt(X, Y - 1, block);
                     break;
                 case State.BlockState.SwapDirection.Right:
-                    replacedBlock = GetBlockAt(X + 1, Y);
+                    replacedBlock = GetBlockAt(X + 1, Y, true);
                     UpdateBufferAt(X + 1, Y, block);
                     break;
                 case State.BlockState.SwapDirection.Down:
-                    replacedBlock = GetBlockAt(X, Y + 1);
+                    replacedBlock = GetBlockAt(X, Y + 1, true);
                     UpdateBufferAt(X, Y + 1, block);
                     break;
                 case State.BlockState.SwapDirection.Left:
-                    replacedBlock = GetBlockAt(X - 1, Y);
+                    replacedBlock = GetBlockAt(X - 1, Y, true);
                     UpdateBufferAt(X - 1, Y, block);
                     break;
             }
