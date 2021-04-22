@@ -98,6 +98,102 @@ namespace FroggoTetrisAttack.Entities
                 }
             }
 
+            // Check for horizontal matches
+            for (int y = 0; y < HEIGHT; y++)
+            {
+                Block.BlockType currentGroupType = Block.BlockType.Empty;
+                int currentGroupCount = 0;
+                for (int x = 0; x < WIDTH; x++)
+                {
+                    Block currentBlock = GetBlockAt(x, y);
+                    if (!(currentBlock.StateMachine.CurrentState is State.BlockReadyState))
+                    {
+                        if (currentGroupCount >= 3 && currentGroupType != Block.BlockType.Empty)
+                        {
+                            // TODO: Clear
+                            for (int x2 = x - currentGroupCount; x2 < x; x2++)
+                            {
+                                GetBlockAt(x2, y).StateMachine.ConsiderStateChange(new State.BlockPreClearState());
+                            }
+                        }
+                        currentGroupCount = 0;
+                    }
+                    else if (currentGroupType == currentBlock.BType)
+                    {
+                        currentGroupCount++;
+                    }
+                    else
+                    {
+                        if (currentGroupCount >= 3 && currentGroupType != Block.BlockType.Empty)
+                        {
+                            // TODO: Clear
+                            for (int x2 = x - currentGroupCount; x2 < x; x2++)
+                            {
+                                GetBlockAt(x2, y).StateMachine.ConsiderStateChange(new State.BlockPreClearState());
+                            }
+                        }
+                        currentGroupCount = 1;
+                        currentGroupType = currentBlock.BType;
+                    }
+                }
+                if (currentGroupCount >= 3 && currentGroupType != Block.BlockType.Empty)
+                {
+                    // TODO: Clear
+                    for (int x2 = WIDTH - currentGroupCount; x2 < WIDTH; x2++)
+                    {
+                        GetBlockAt(x2, y).StateMachine.ConsiderStateChange(new State.BlockPreClearState());
+                    }
+                }
+            }
+
+            // Check for vertical matches
+            for (int x = 0; x < WIDTH; x++)
+            {
+                Block.BlockType currentGroupType = Block.BlockType.Empty;
+                int currentGroupCount = 0;
+                for (int y = 0; y < HEIGHT; y++)
+                {
+                    Block currentBlock = GetBlockAt(x, y);
+                    if (!(currentBlock.StateMachine.CurrentState is State.BlockReadyState))
+                    {
+                        if (currentGroupCount >= 3 && currentGroupType != Block.BlockType.Empty)
+                        {
+                            // TODO: Clear
+                            for (int y2 = y - currentGroupCount; y2 < y; y2++)
+                            {
+                                GetBlockAt(x, y2).StateMachine.ConsiderStateChange(new State.BlockPreClearState());
+                            }
+                        }
+                        currentGroupCount = 0;
+                    }
+                    else if (currentGroupType == currentBlock.BType)
+                    {
+                        currentGroupCount++;
+                    }
+                    else
+                    {
+                        if (currentGroupCount >= 3 && currentGroupType != Block.BlockType.Empty)
+                        {
+                            // TODO: Clear
+                            for (int y2 = y - currentGroupCount; y2 < y; y2++)
+                            {
+                                GetBlockAt(x, y2).StateMachine.ConsiderStateChange(new State.BlockPreClearState());
+                            }
+                        }
+                        currentGroupCount = 1;
+                        currentGroupType = currentBlock.BType;
+                    }
+                }
+                if (currentGroupCount >= 3 && currentGroupType != Block.BlockType.Empty)
+                {
+                    // TODO: Clear
+                    for (int y2 = HEIGHT - currentGroupCount; y2 < HEIGHT; y2++)
+                    {
+                        GetBlockAt(x, y2).StateMachine.ConsiderStateChange(new State.BlockPreClearState());
+                    }
+                }
+            }
+
             // Nope out of here if input is locked
             if (isInputLocked)
             {
@@ -178,6 +274,11 @@ namespace FroggoTetrisAttack.Entities
         public bool IsVisible()
         {
             return true;
+        }
+
+        public Block GetBlockAt1D(int Index)
+        {
+            return _blocks[Index % WIDTH, Index / WIDTH];
         }
 
         public Block GetBlockAt(int X, int Y, bool IncludeBuffer = false)

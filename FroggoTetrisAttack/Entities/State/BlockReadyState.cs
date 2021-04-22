@@ -4,9 +4,9 @@
     {
         public override BlockState ConsiderStateChange(BlockState CandidateState, Block Target)
         {
-            if (CandidateState is BlockSwappingState state) 
+            if (CandidateState is BlockSwappingState || CandidateState is BlockPreClearState) 
             {
-                return state;
+                return CandidateState;
             }
             return this;
         }

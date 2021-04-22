@@ -12,8 +12,11 @@
             var bottomBlock = Context.Bottom;
             // TODO: Handle case where block below is in pre-fall
             if (
-                bottomBlock == null || 
-                bottomBlock.BType != Block.BlockType.Empty
+                bottomBlock == null ||
+                (
+                    bottomBlock.BType != Block.BlockType.Empty &&
+                    !(bottomBlock.StateMachine.CurrentState is BlockFallingState)
+                )
             )
             {
                 return new BlockReadyState();
