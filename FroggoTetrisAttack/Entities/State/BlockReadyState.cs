@@ -27,6 +27,10 @@
                     return new BlockPreFallFollowerState();
                 }
             }
+            else if (Context.Top?.StateMachine.CurrentState is BlockPreFallLeaderState)
+            {
+                return new BlockEmptyAwaitingFallState();
+            }
             return this;
         }
     }
