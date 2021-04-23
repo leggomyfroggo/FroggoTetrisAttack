@@ -25,15 +25,31 @@ namespace FroggoTetrisAttack.Entities
             Purple = 4 
         }
 
+        public enum BlockFace
+        {
+            Neutral,
+            Flash1,
+            Flash2,
+            Dead,
+        }
+
         public State.BlockStateMachine StateMachine { get; private set; }
 
-        private static Dictionary<BlockType, Rectangle> BlockTypeToImage = new Dictionary<BlockType, Rectangle>() 
+        private static Dictionary<BlockType, int> BlockTypeToColumn = new Dictionary<BlockType, int>() 
         {
-            { BlockType.Red, GraphicsHelper.GetSheetCell(new Index2(3, 0), 16, 16) },
-            { BlockType.Blue, GraphicsHelper.GetSheetCell(new Index2(1, 0), 16, 16) },
-            { BlockType.Green, GraphicsHelper.GetSheetCell(new Index2(0, 0), 16, 16) },
-            { BlockType.Yellow, GraphicsHelper.GetSheetCell(new Index2(0, 1), 16, 16) },
-            { BlockType.Purple, GraphicsHelper.GetSheetCell(new Index2(2, 0), 16, 16) },
+            { BlockType.Green, 0 },
+            { BlockType.Blue, 1 },
+            { BlockType.Purple, 2 },
+            { BlockType.Red, 3 },
+            { BlockType.Yellow, 4 },
+        };
+
+        private static Dictionary<BlockFace, int> BlockFaceToRow = new Dictionary<BlockFace, int>()
+        {
+            { BlockFace.Neutral, 0 },
+            { BlockFace.Flash1, 1 },
+            { BlockFace.Flash2, 2 },
+            { BlockFace.Dead, 3 },
         };
 
         public BlockType BType { get; private set; }
@@ -52,7 +68,7 @@ namespace FroggoTetrisAttack.Entities
 
         public void Draw(int PlayFieldX, int PlayFieldY, int IndexX, int IndexY)
         {
-            if (BType == BlockType.Empty)
+            if (BType == BlockType.Empty || !StateMachine.CurrentState.IsVisible())
             {
                 return;
             }
@@ -66,7 +82,7 @@ namespace FroggoTetrisAttack.Entities
                     BLOCK_SIZE, 
                     BLOCK_SIZE
                 ),
-                BlockTypeToImage[BType]
+                GetImageSource()
             );
         }
 
@@ -88,6 +104,20 @@ namespace FroggoTetrisAttack.Entities
         public bool IsClearable()
         {
             return StateMachine.CurrentState is State.BlockReadyState && BType != BlockType.Empty;
+        }
+
+        public bool IsEmptyAndInactive()
+        {
+            return StateMachine.CurrentState is State.BlockReadyState && BType == BlockType.Empty;
+        }
+
+        private Rectangle GetImageSource()
+        {
+            return GraphicsHelper.GetSheetCell(
+                new Index2(BlockTypeToColumn[BType], BlockFaceToRow[StateMachine.CurrentState.GetBlockFace()]),
+                16,
+                16
+            );
         }
     }
 }

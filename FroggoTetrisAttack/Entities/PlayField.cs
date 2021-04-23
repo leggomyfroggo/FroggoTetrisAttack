@@ -98,6 +98,7 @@ namespace FroggoTetrisAttack.Entities
                 }
             }
 
+            int totalMatchCount = 0;
             bool[,] matchMap = new bool[WIDTH, HEIGHT];
 
             // Horizontal matches
@@ -114,6 +115,7 @@ namespace FroggoTetrisAttack.Entities
                         {
                             for (int r = 1; r <= numContiguous; r++)
                             {
+                                totalMatchCount++;
                                 matchMap[x - r, y] = true;
                             }
                         }
@@ -140,6 +142,7 @@ namespace FroggoTetrisAttack.Entities
                         {
                             for (int r = 1; r <= numContiguous; r++)
                             {
+                                totalMatchCount++;
                                 matchMap[x, y - r] = true;
                             }
                         }
@@ -152,13 +155,14 @@ namespace FroggoTetrisAttack.Entities
                 }
             }
 
+            int popIndex = 0;
             for (int y = 0; y < HEIGHT; y++)
             {
-                for (int x = WIDTH - 1; x >= 0; x--)
+                for (int x = 0; x < WIDTH; x++)
                 {
                     if (matchMap[x, y])
                     {
-                        GetBlockAt(x, y).StateMachine.ConsiderStateChange(new State.BlockPreClearState());
+                        GetBlockAt(x, y).StateMachine.ConsiderStateChange(new State.BlockPreClearState(popIndex++, totalMatchCount));
                     }
                 }
             }

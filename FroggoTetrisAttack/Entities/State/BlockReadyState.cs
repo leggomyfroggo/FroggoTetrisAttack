@@ -15,7 +15,7 @@
         {
             if (Target.BType != Block.BlockType.Empty)
             {
-                if (Context.Bottom?.BType == Block.BlockType.Empty)
+                if (Context.Bottom?.IsEmptyAndInactive() == true)
                 {
                     return new BlockPreFallLeaderState();
                 }

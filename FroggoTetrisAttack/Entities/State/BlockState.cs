@@ -39,5 +39,15 @@ namespace FroggoTetrisAttack.Entities.State
             }
             return Vector2.Zero;
         }
+
+        public virtual bool IsVisible()
+        {
+            return true;
+        }
+
+        public virtual Block.BlockFace GetBlockFace()
+        {
+            return Block.BlockFace.Neutral;
+        }
     }
 }
