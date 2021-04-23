@@ -98,98 +98,67 @@ namespace FroggoTetrisAttack.Entities
                 }
             }
 
-            // Check for horizontal matches
+            bool[,] matchMap = new bool[WIDTH, HEIGHT];
+
+            // Horizontal matches
             for (int y = 0; y < HEIGHT; y++)
             {
-                Block.BlockType currentGroupType = Block.BlockType.Empty;
-                int currentGroupCount = 0;
-                for (int x = 0; x < WIDTH; x++)
+                int numContiguous = 0;
+                for (int x = 0; x <= WIDTH; x++)
                 {
                     Block currentBlock = GetBlockAt(x, y);
-                    if (!(currentBlock.StateMachine.CurrentState is State.BlockReadyState))
+                    Block prevBlock = GetBlockAt(x - 1, y);
+                    if (prevBlock?.BType != currentBlock?.BType || x == WIDTH)
                     {
-                        if (currentGroupCount >= 3 && currentGroupType != Block.BlockType.Empty)
+                        if (numContiguous >= 3)
                         {
-                            // TODO: Clear
-                            for (int x2 = x - currentGroupCount; x2 < x; x2++)
+                            for (int r = 1; r <= numContiguous; r++)
                             {
-                                GetBlockAt(x2, y).StateMachine.ConsiderStateChange(new State.BlockPreClearState());
+                                matchMap[x - r, y] = true;
                             }
                         }
-                        currentGroupCount = 0;
+                        numContiguous = 0;
                     }
-                    else if (currentGroupType == currentBlock.BType)
+                    if (currentBlock?.IsClearable() == true)
                     {
-                        currentGroupCount++;
-                    }
-                    else
-                    {
-                        if (currentGroupCount >= 3 && currentGroupType != Block.BlockType.Empty)
-                        {
-                            // TODO: Clear
-                            for (int x2 = x - currentGroupCount; x2 < x; x2++)
-                            {
-                                GetBlockAt(x2, y).StateMachine.ConsiderStateChange(new State.BlockPreClearState());
-                            }
-                        }
-                        currentGroupCount = 1;
-                        currentGroupType = currentBlock.BType;
-                    }
-                }
-                if (currentGroupCount >= 3 && currentGroupType != Block.BlockType.Empty)
-                {
-                    // TODO: Clear
-                    for (int x2 = WIDTH - currentGroupCount; x2 < WIDTH; x2++)
-                    {
-                        GetBlockAt(x2, y).StateMachine.ConsiderStateChange(new State.BlockPreClearState());
+                        numContiguous++;
                     }
                 }
             }
 
-            // Check for vertical matches
-            for (int x = 0; x < WIDTH; x++)
+            // Vertical matches
+            for (int x = 0; x <= WIDTH; x++)
             {
-                Block.BlockType currentGroupType = Block.BlockType.Empty;
-                int currentGroupCount = 0;
-                for (int y = 0; y < HEIGHT; y++)
+                int numContiguous = 0;
+                for (int y = 0; y <= HEIGHT; y++)
                 {
                     Block currentBlock = GetBlockAt(x, y);
-                    if (!(currentBlock.StateMachine.CurrentState is State.BlockReadyState))
+                    Block prevBlock = GetBlockAt(x, y - 1);
+                    if (prevBlock?.BType != currentBlock?.BType || y == HEIGHT)
                     {
-                        if (currentGroupCount >= 3 && currentGroupType != Block.BlockType.Empty)
+                        if (numContiguous >= 3)
                         {
-                            // TODO: Clear
-                            for (int y2 = y - currentGroupCount; y2 < y; y2++)
+                            for (int r = 1; r <= numContiguous; r++)
                             {
-                                GetBlockAt(x, y2).StateMachine.ConsiderStateChange(new State.BlockPreClearState());
+                                matchMap[x, y - r] = true;
                             }
                         }
-                        currentGroupCount = 0;
+                        numContiguous = 0;
                     }
-                    else if (currentGroupType == currentBlock.BType)
+                    if (currentBlock?.IsClearable() == true)
                     {
-                        currentGroupCount++;
-                    }
-                    else
-                    {
-                        if (currentGroupCount >= 3 && currentGroupType != Block.BlockType.Empty)
-                        {
-                            // TODO: Clear
-                            for (int y2 = y - currentGroupCount; y2 < y; y2++)
-                            {
-                                GetBlockAt(x, y2).StateMachine.ConsiderStateChange(new State.BlockPreClearState());
-                            }
-                        }
-                        currentGroupCount = 1;
-                        currentGroupType = currentBlock.BType;
+                        numContiguous++;
                     }
                 }
-                if (currentGroupCount >= 3 && currentGroupType != Block.BlockType.Empty)
+            }
+
+            for (int y = 0; y < HEIGHT; y++)
+            {
+                for (int x = WIDTH - 1; x >= 0; x--)
                 {
-                    // TODO: Clear
-                    for (int y2 = HEIGHT - currentGroupCount; y2 < HEIGHT; y2++)
+                    if (matchMap[x, y])
                     {
-                        GetBlockAt(x, y2).StateMachine.ConsiderStateChange(new State.BlockPreClearState());
+                        GetBlockAt(x, y).StateMachine.ConsiderStateChange(new State.BlockPreClearState());
                     }
                 }
             }

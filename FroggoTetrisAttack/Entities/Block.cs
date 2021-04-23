@@ -84,5 +84,10 @@ namespace FroggoTetrisAttack.Entities
         {
             BType = NewType;
         }
+
+        public bool IsClearable()
+        {
+            return StateMachine.CurrentState is State.BlockReadyState && BType != BlockType.Empty;
+        }
     }
 }
