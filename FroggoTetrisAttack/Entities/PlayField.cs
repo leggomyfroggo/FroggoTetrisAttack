@@ -109,7 +109,7 @@ namespace FroggoTetrisAttack.Entities
                 {
                     Block currentBlock = GetBlockAt(x, y);
                     Block prevBlock = GetBlockAt(x - 1, y);
-                    if (prevBlock?.BType != currentBlock?.BType || x == WIDTH)
+                    if (prevBlock?.BType != currentBlock?.BType || prevBlock?.IsClearable() == false || x == WIDTH)
                     {
                         if (numContiguous >= 3)
                         {
@@ -136,7 +136,7 @@ namespace FroggoTetrisAttack.Entities
                 {
                     Block currentBlock = GetBlockAt(x, y);
                     Block prevBlock = GetBlockAt(x, y - 1);
-                    if (prevBlock?.BType != currentBlock?.BType || y == HEIGHT)
+                    if (prevBlock?.BType != currentBlock?.BType || prevBlock?.IsClearable() == false || y == HEIGHT)
                     {
                         if (numContiguous >= 3)
                         {
