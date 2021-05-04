@@ -66,7 +66,7 @@ namespace FroggoTetrisAttack.Entities
             StateMachine.Update(DT, Context);
         }
 
-        public void Draw(int PlayFieldX, int PlayFieldY, int IndexX, int IndexY)
+        public void Draw(int PlayFieldX, int PlayFieldY, int IndexX, int IndexY, float RiseProgress, bool IsActive = true)
         {
             if (BType == BlockType.Empty || !StateMachine.CurrentState.IsVisible())
             {
@@ -74,16 +74,34 @@ namespace FroggoTetrisAttack.Entities
             }
 
             var offset = StateMachine.CurrentState.GetSwapOffset();
-            GameService.GetService<IRenderService>().DrawQuad(
-                "blocks",
-                new Rectangle(
-                    PlayFieldX + IndexX * BLOCK_SIZE + (int)offset.X, 
-                    PlayFieldY + IndexY * BLOCK_SIZE + (int)offset.Y, 
-                    BLOCK_SIZE, 
-                    BLOCK_SIZE
-                ),
-                GetImageSource()
-            );
+            if (IsActive)
+            {
+                GameService.GetService<IRenderService>().DrawQuad(
+                    "blocks",
+                    new Rectangle(
+                        PlayFieldX + IndexX * BLOCK_SIZE + (int)offset.X,
+                        PlayFieldY + IndexY * BLOCK_SIZE + (int)offset.Y - (int)(RiseProgress * BLOCK_SIZE),
+                        BLOCK_SIZE,
+                        BLOCK_SIZE
+                    ),
+                    GetImageSource()
+                );
+            }
+            else
+            {
+                int riseProgressNormalized = (int)(RiseProgress * BLOCK_SIZE);
+                GameService.GetService<IRenderService>().DrawQuad(
+                    "blocks",
+                    new Rectangle(
+                        PlayFieldX + IndexX * BLOCK_SIZE + (int)offset.X,
+                        PlayFieldY + IndexY * BLOCK_SIZE + (int)offset.Y - (int)(RiseProgress * BLOCK_SIZE),
+                        BLOCK_SIZE,
+                        riseProgressNormalized
+                    ),
+                    GetPartialImageSource(riseProgressNormalized),
+                    Tint: Color.Gray
+                );
+            }
         }
 
         public BackingBox GetBackingBox()
@@ -115,8 +133,17 @@ namespace FroggoTetrisAttack.Entities
         {
             return GraphicsHelper.GetSheetCell(
                 new Index2(BlockTypeToColumn[BType], BlockFaceToRow[StateMachine.CurrentState.GetBlockFace()]),
-                16,
-                16
+                BLOCK_SIZE,
+                BLOCK_SIZE
+            );
+        }
+
+        private Rectangle GetPartialImageSource(int RiseProgressNormalized)
+        {
+            return GraphicsHelper.GetSheetCell(
+                new Index2(BlockTypeToColumn[BType], BlockFaceToRow[StateMachine.CurrentState.GetBlockFace()]),
+                BLOCK_SIZE,
+                RiseProgressNormalized
             );
         }
     }
