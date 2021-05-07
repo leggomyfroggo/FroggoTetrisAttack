@@ -31,6 +31,8 @@ namespace FroggoTetrisAttack.Entities
             Flash1,
             Flash2,
             Dead,
+            PreFall,
+            Fall,
         }
 
         public State.BlockStateMachine StateMachine { get; private set; }
@@ -50,6 +52,8 @@ namespace FroggoTetrisAttack.Entities
             { BlockFace.Flash1, 1 },
             { BlockFace.Flash2, 2 },
             { BlockFace.Dead, 3 },
+            { BlockFace.PreFall, 4 },
+            { BlockFace.Fall, 5 },
         };
 
         public BlockType BType { get; private set; }

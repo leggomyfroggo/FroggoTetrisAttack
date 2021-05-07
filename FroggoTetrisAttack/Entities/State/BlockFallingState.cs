@@ -28,5 +28,10 @@
         {
             return SwapDirection.Down;
         }
+
+        public override Block.BlockFace GetBlockFace()
+        {
+            return Block.BlockFace.Fall;
+        }
     }
 }
