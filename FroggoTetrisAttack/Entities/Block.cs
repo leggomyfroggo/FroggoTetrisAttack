@@ -66,7 +66,7 @@ namespace FroggoTetrisAttack.Entities
             StateMachine.Update(DT, Context);
         }
 
-        public void Draw(int PlayFieldX, int PlayFieldY, int IndexX, int IndexY)
+        public void Draw(int PlayFieldX, int PlayFieldY, int IndexX, int IndexY, Color? Tint = null)
         {
             if (BType == BlockType.Empty || !StateMachine.CurrentState.IsVisible())
             {
@@ -82,7 +82,8 @@ namespace FroggoTetrisAttack.Entities
                     BLOCK_SIZE, 
                     BLOCK_SIZE
                 ),
-                GetImageSource()
+                GetImageSource(),
+                Tint: Tint
             );
         }
 
