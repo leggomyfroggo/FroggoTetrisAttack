@@ -223,23 +223,24 @@ namespace FroggoTetrisAttack.Entities
 
         public void Draw()
         {
+            int newLineProgress = (int)_newLineProgress;
             for (int x = 0; x < WIDTH; x++)
             {
                 for (int y = 0; y < HEIGHT; y++)
                 {
-                    GetBlockAt(x, y).Draw(PLAYFIELD_X, PLAYFIELD_Y, x, y);
+                    GetBlockAt(x, y).Draw(PLAYFIELD_X, PLAYFIELD_Y - newLineProgress, x, y);
                 }
-                _newLine[x].Draw(PLAYFIELD_X, PLAYFIELD_Y, x, HEIGHT, Tint: Color.Gray);
+                _newLine[x].Draw(PLAYFIELD_X, PLAYFIELD_Y - newLineProgress, x, HEIGHT, Tint: Color.Gray, VisibleLines: (int)_newLineProgress);
             }
-            DrawSwapper();
+            DrawSwapper(newLineProgress);
         }
 
-        private void DrawSwapper()
+        private void DrawSwapper(int YOffset)
         {
             GraphicsHelper.DrawSquare(
                 new Rectangle(
                     PLAYFIELD_X + _swapperXIndex * Block.BLOCK_SIZE, 
-                    PLAYFIELD_Y + _swapperYIndex * Block.BLOCK_SIZE, 
+                    PLAYFIELD_Y + _swapperYIndex * Block.BLOCK_SIZE - YOffset, 
                     Block.BLOCK_SIZE, 
                     Block.BLOCK_SIZE
                 ),
@@ -248,7 +249,7 @@ namespace FroggoTetrisAttack.Entities
             GraphicsHelper.DrawSquare(
                 new Rectangle(
                     PLAYFIELD_X + (_swapperXIndex + 1) * Block.BLOCK_SIZE, 
-                    PLAYFIELD_Y + _swapperYIndex * Block.BLOCK_SIZE, 
+                    PLAYFIELD_Y + _swapperYIndex * Block.BLOCK_SIZE - YOffset, 
                     Block.BLOCK_SIZE, 
                     Block.BLOCK_SIZE
                 ),

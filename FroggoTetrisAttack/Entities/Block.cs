@@ -66,7 +66,7 @@ namespace FroggoTetrisAttack.Entities
             StateMachine.Update(DT, Context);
         }
 
-        public void Draw(int PlayFieldX, int PlayFieldY, int IndexX, int IndexY, Color? Tint = null)
+        public void Draw(int PlayFieldX, int PlayFieldY, int IndexX, int IndexY, Color? Tint = null, int VisibleLines = BLOCK_SIZE)
         {
             if (BType == BlockType.Empty || !StateMachine.CurrentState.IsVisible())
             {
@@ -80,9 +80,9 @@ namespace FroggoTetrisAttack.Entities
                     PlayFieldX + IndexX * BLOCK_SIZE + (int)offset.X, 
                     PlayFieldY + IndexY * BLOCK_SIZE + (int)offset.Y, 
                     BLOCK_SIZE, 
-                    BLOCK_SIZE
+                    VisibleLines
                 ),
-                GetImageSource(),
+                GetImageSource(VisibleLines),
                 Tint: Tint
             );
         }
@@ -112,12 +112,12 @@ namespace FroggoTetrisAttack.Entities
             return StateMachine.CurrentState is State.BlockReadyState && BType == BlockType.Empty;
         }
 
-        private Rectangle GetImageSource()
+        private Rectangle GetImageSource(int VisibleLines)
         {
             return GraphicsHelper.GetSheetCell(
                 new Index2(BlockTypeToColumn[BType], BlockFaceToRow[StateMachine.CurrentState.GetBlockFace()]),
                 16,
-                16
+                VisibleLines
             );
         }
     }
