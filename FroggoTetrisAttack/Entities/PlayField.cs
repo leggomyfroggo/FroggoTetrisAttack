@@ -229,7 +229,7 @@ namespace FroggoTetrisAttack.Entities
                 {
                     GetBlockAt(x, y).Draw(PLAYFIELD_X, PLAYFIELD_Y, x, y);
                 }
-                _newLine[x].Draw(PLAYFIELD_X, PLAYFIELD_Y, x, HEIGHT);
+                _newLine[x].Draw(PLAYFIELD_X, PLAYFIELD_Y, x, HEIGHT, Tint: Color.Gray);
             }
             DrawSwapper();
         }
