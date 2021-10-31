@@ -21,6 +21,9 @@ namespace FroggoTetrisAttack.Entities
         private Block[,] _blocks;
         private Block[,] _blockBuffer;
 
+        private Block[] _newLine;
+        private float _newLineProgress;
+
         private State.PlayFieldStateMachine _stateMachine;
 
         private int _swapperXIndex;
@@ -54,6 +57,19 @@ namespace FroggoTetrisAttack.Entities
                         _blocks[x, y] = new Block(suggestedType, this);
                     }
                 }
+            }
+
+            // Create the new line
+            _newLine = new Block[WIDTH];
+            for (int x = 0; x < _newLine.Length; x++)
+            {
+                Block.BlockType suggestedType;
+                do
+                {
+                    suggestedType = (Block.BlockType)rand.Next(0, 5);
+                }
+                while (x > 0 && _newLine[x - 1].BType == suggestedType);
+                _newLine[x] = new Block(suggestedType, this);
             }
 
             _stateMachine = new State.PlayFieldStateMachine(new State.PlayFieldActiveState(), this);
@@ -213,6 +229,7 @@ namespace FroggoTetrisAttack.Entities
                 {
                     GetBlockAt(x, y).Draw(PLAYFIELD_X, PLAYFIELD_Y, x, y);
                 }
+                _newLine[x].Draw(PLAYFIELD_X, PLAYFIELD_Y, x, HEIGHT);
             }
             DrawSwapper();
         }
