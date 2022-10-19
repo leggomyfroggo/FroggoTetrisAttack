@@ -18,12 +18,14 @@ namespace FroggoTetrisAttack.Entities
         private const int PLAYFIELD_Y = 24;
         private const int WIDTH = 6;
         private const int HEIGHT = 12;
+        private const int DIRECTION_HOLD_THRESHOLD = 15;
 
         private Block[,] _blocks;
         private Block[,] _blockBuffer;
 
         private State.PlayFieldStateMachine _stateMachine;
 
+        private int _directionHeldTimer;
         private int _swapperXIndex;
         private int _swapperYIndex;
 
@@ -74,6 +76,7 @@ namespace FroggoTetrisAttack.Entities
             }
 
             _stateMachine = new State.PlayFieldStateMachine(new State.PlayFieldActiveState(), this);
+            _directionHeldTimer = 0;
             _swapperXIndex = 2;
             _swapperYIndex = 6;
             _riseProgress = 0f;
@@ -224,19 +227,44 @@ namespace FroggoTetrisAttack.Entities
             }
 
             var inputService = GameService.GetService<IInputService>();
-            if (inputService.WasActionPressed(InputAction.Left))
+            if (
+                inputService.IsActionHeld(InputAction.Left) ||
+                inputService.IsActionHeld(InputAction.Up) ||
+                inputService.IsActionHeld(InputAction.Right) ||
+                inputService.IsActionHeld(InputAction.Down)
+            )
+            {
+                _directionHeldTimer++;
+            } else
+            {
+                _directionHeldTimer = 0;
+            }
+
+            if (
+                inputService.WasActionPressed(InputAction.Left) || 
+                (inputService.IsActionHeld(InputAction.Left) && _directionHeldTimer > DIRECTION_HOLD_THRESHOLD)
+            )
             {
                 _swapperXIndex = Math.Clamp(_swapperXIndex - 1, 0, WIDTH - 2);
             }
-            else if (inputService.WasActionPressed(InputAction.Right))
+            else if (
+                inputService.WasActionPressed(InputAction.Right) ||
+                (inputService.IsActionHeld(InputAction.Right) && _directionHeldTimer > DIRECTION_HOLD_THRESHOLD)
+            )
             {
                 _swapperXIndex = Math.Clamp(_swapperXIndex + 1, 0, WIDTH - 2);
             }
-            if (inputService.WasActionPressed(InputAction.Up))
+            if (
+                inputService.WasActionPressed(InputAction.Up) ||
+                (inputService.IsActionHeld(InputAction.Up) && _directionHeldTimer > DIRECTION_HOLD_THRESHOLD)
+            )
             {
                 _swapperYIndex = Math.Clamp(_swapperYIndex - 1, 0, HEIGHT - 1);
             }
-            else if (inputService.WasActionPressed(InputAction.Down))
+            else if (
+                inputService.WasActionPressed(InputAction.Down) ||
+                (inputService.IsActionHeld(InputAction.Down) && _directionHeldTimer > DIRECTION_HOLD_THRESHOLD)
+            )
             {
                 _swapperYIndex = Math.Clamp(_swapperYIndex + 1, 0, HEIGHT - 1);
             }
