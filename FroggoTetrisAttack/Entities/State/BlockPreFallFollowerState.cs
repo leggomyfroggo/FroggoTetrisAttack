@@ -16,5 +16,10 @@
             }
             return this;
         }
+
+        public override Block.BlockFace GetBlockFace()
+        {
+            return Block.BlockFace.PreFall;
+        }
     }
 }

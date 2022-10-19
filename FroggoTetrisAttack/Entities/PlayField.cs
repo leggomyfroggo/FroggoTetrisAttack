@@ -13,6 +13,7 @@ namespace FroggoTetrisAttack.Entities
 {
     public class PlayField : ISceneEntity, IDraw, IPreDraw
     {
+        private const float RISE_LINES_PER_SECOND = 0.1f;
         private const int PLAYFIELD_X = 152;
         private const int PLAYFIELD_Y = 24;
         private const int WIDTH = 6;
@@ -21,13 +22,13 @@ namespace FroggoTetrisAttack.Entities
         private Block[,] _blocks;
         private Block[,] _blockBuffer;
 
-        private Block[] _newLine;
-        private float _newLineProgress;
-
         private State.PlayFieldStateMachine _stateMachine;
 
         private int _swapperXIndex;
         private int _swapperYIndex;
+
+        private float _riseProgress;
+        private Block[] _newLine;
 
         public PlayField()
         {
@@ -75,6 +76,8 @@ namespace FroggoTetrisAttack.Entities
             _stateMachine = new State.PlayFieldStateMachine(new State.PlayFieldActiveState(), this);
             _swapperXIndex = 2;
             _swapperYIndex = 6;
+            _riseProgress = 0f;
+            _newLine = GenerateNewLine();
         }
 
         public void OnAdd(Scene ParentScene) { }
@@ -84,6 +87,7 @@ namespace FroggoTetrisAttack.Entities
         public void PreDraw(float DT) 
         {
             // Primary update loop for the field, going from bottom to top to account for gravity
+            bool isRiseLocked = false;
             bool isInputLocked = false;
             for (int x = 0; x < WIDTH; x++)
             {
@@ -99,6 +103,10 @@ namespace FroggoTetrisAttack.Entities
                     if (!isInputLocked && currentBlockState is State.BlockSwappingState)
                     {
                         isInputLocked = true;
+                    }
+                    if (!isRiseLocked && !(currentBlockState is State.BlockReadyState))
+                    {
+                        isRiseLocked = true;
                     }
                     SwapBlockToBuffer(x, y, currentBlockState.GetSwapDirection());
                 }
@@ -183,6 +191,32 @@ namespace FroggoTetrisAttack.Entities
                 }
             }
 
+            // Raise the playfield if not locked
+            if (!isRiseLocked)
+            {
+                _riseProgress += DT * RISE_LINES_PER_SECOND;
+                while (_riseProgress >= 1)
+                {
+                    _riseProgress -= 1;
+                    for (int y = 0; y < HEIGHT; y++)
+                    {
+                        for (int x = 0; x < WIDTH; x++)
+                        {
+                            if (y < HEIGHT - 1)
+                            {
+                                _blocks[x, y] = _blocks[x, y + 1];
+                            }
+                            else
+                            {
+                                _blocks[x, y] = _newLine[x];
+                            }
+                        }
+                    }
+                    _newLine = GenerateNewLine();
+                    _swapperYIndex--;
+                }
+            }
+
             // Nope out of here if input is locked
             if (isInputLocked)
             {
@@ -223,24 +257,25 @@ namespace FroggoTetrisAttack.Entities
 
         public void Draw()
         {
-            int newLineProgress = (int)_newLineProgress;
+            int newLineProgress = (int)_riseProgress;
             for (int x = 0; x < WIDTH; x++)
             {
                 for (int y = 0; y < HEIGHT; y++)
                 {
-                    GetBlockAt(x, y).Draw(PLAYFIELD_X, PLAYFIELD_Y - newLineProgress, x, y);
+                    GetBlockAt(x, y).Draw(PLAYFIELD_X, PLAYFIELD_Y, x, y, _riseProgress);
                 }
-                _newLine[x].Draw(PLAYFIELD_X, PLAYFIELD_Y - newLineProgress, x, HEIGHT, Tint: Color.Gray, VisibleLines: (int)_newLineProgress);
+                _newLine[x].Draw(PLAYFIELD_X, PLAYFIELD_Y, x, HEIGHT, _riseProgress, false);
             }
             DrawSwapper(newLineProgress);
         }
 
         private void DrawSwapper(int YOffset)
         {
+            int riseProgressNormalized = (int)(_riseProgress * Block.BLOCK_SIZE);
             GraphicsHelper.DrawSquare(
                 new Rectangle(
                     PLAYFIELD_X + _swapperXIndex * Block.BLOCK_SIZE, 
-                    PLAYFIELD_Y + _swapperYIndex * Block.BLOCK_SIZE - YOffset, 
+                    PLAYFIELD_Y + _swapperYIndex * Block.BLOCK_SIZE - riseProgressNormalized, 
                     Block.BLOCK_SIZE, 
                     Block.BLOCK_SIZE
                 ),
@@ -249,7 +284,7 @@ namespace FroggoTetrisAttack.Entities
             GraphicsHelper.DrawSquare(
                 new Rectangle(
                     PLAYFIELD_X + (_swapperXIndex + 1) * Block.BLOCK_SIZE, 
-                    PLAYFIELD_Y + _swapperYIndex * Block.BLOCK_SIZE - YOffset, 
+                    PLAYFIELD_Y + _swapperYIndex * Block.BLOCK_SIZE - riseProgressNormalized, 
                     Block.BLOCK_SIZE, 
                     Block.BLOCK_SIZE
                 ),
@@ -321,6 +356,23 @@ namespace FroggoTetrisAttack.Entities
                 return;
             }
             _blockBuffer[X, Y] = B;
+        }
+
+        private Block[] GenerateNewLine()
+        {
+            Random rand = new Random();
+            Block[] newLine = new Block[WIDTH];
+            Block.BlockType suggestedType;
+            for (int x = 0; x < WIDTH; x++)
+            {
+                do
+                {
+                    suggestedType = (Block.BlockType)rand.Next(0, 5);
+                }
+                while ((x > 0 && newLine[x - 1].BType == suggestedType));
+                newLine[x] = new Block(suggestedType, this);
+            }
+            return newLine;
         }
     }
 }
