@@ -60,6 +60,19 @@ namespace FroggoTetrisAttack.Entities
                 }
             }
 
+            // Create the new line
+            _newLine = new Block[WIDTH];
+            for (int x = 0; x < _newLine.Length; x++)
+            {
+                Block.BlockType suggestedType;
+                do
+                {
+                    suggestedType = (Block.BlockType)rand.Next(0, 5);
+                }
+                while (x > 0 && _newLine[x - 1].BType == suggestedType);
+                _newLine[x] = new Block(suggestedType, this);
+            }
+
             _stateMachine = new State.PlayFieldStateMachine(new State.PlayFieldActiveState(), this);
             _swapperXIndex = 2;
             _swapperYIndex = 6;
@@ -244,6 +257,7 @@ namespace FroggoTetrisAttack.Entities
 
         public void Draw()
         {
+            int newLineProgress = (int)_riseProgress;
             for (int x = 0; x < WIDTH; x++)
             {
                 for (int y = 0; y < HEIGHT; y++)
@@ -252,10 +266,10 @@ namespace FroggoTetrisAttack.Entities
                 }
                 _newLine[x].Draw(PLAYFIELD_X, PLAYFIELD_Y, x, HEIGHT, _riseProgress, false);
             }
-            DrawSwapper();
+            DrawSwapper(newLineProgress);
         }
 
-        private void DrawSwapper()
+        private void DrawSwapper(int YOffset)
         {
             int riseProgressNormalized = (int)(_riseProgress * Block.BLOCK_SIZE);
             GraphicsHelper.DrawSquare(
