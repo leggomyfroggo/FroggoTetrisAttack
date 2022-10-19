@@ -28,7 +28,6 @@ namespace FroggoTetrisAttack
 
             _graphics.PreferredBackBufferWidth = 800;
             _graphics.PreferredBackBufferHeight = 480;
-            _graphics.IsFullScreen = true;
             _graphics.ApplyChanges();
         }
 
